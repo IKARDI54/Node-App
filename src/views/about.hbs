@@ -1,0 +1,27 @@
+<div class="card">
+    <div class="card-body">
+        <h1>About Nodejs</h1>
+        <p>
+        Ideado como un entorno de ejecución de JavaScript orientado a eventos asíncronos, Node.js está diseñado para crear aplicaciones network escalables. En el siguiente ejemplo de "hola mundo", pueden atenderse muchas conexiones simultáneamente. Por cada conexión, se activa la devolución de llamada o callback, pero si no hay trabajo que hacer, Node.js se dormirá.
+        <br><br>
+        const http = require('http');
+
+        const hostname = '127.0.0.1';
+        const port = 3000;
+
+        const server = http.createServer((req, res) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/plain');
+        res.end('Hola Mundo');
+        });
+
+        server.listen(port, hostname, () => {
+        console.log(`El servidor se está ejecutando en http://${hostname}:${port}/`);
+        });
+        <br><br>
+        Esto contrasta con el modelo de concurrencia más común de hoy en día, en el que se emplean hilos del Sistema Operativo. Las redes basadas en hilos son relativamente ineficientes y muy difíciles de usar. Además, los usuarios de Node.js están libres de preocuparse por el bloqueo del proceso, ya que no existe. Casi ninguna función en Node.js realiza I/O directamente, por lo que el proceso nunca se bloquea. Por ello, es muy propicio desarrollar sistemas escalables en Node.js.
+
+        Si alguno de estos términos no le es familiar, hay un artículo completo en Blocking vs Non-Blocking.
+        </p>
+    </div>
+</div>
