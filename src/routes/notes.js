@@ -2,14 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 const Note = require('../models/Note');
+const {isAuthenticated} = require('../helpers/auth')
 
 //Formulario nueva nota
-router.get('/notes/add', (req,res) => {
+router.get('/notes/add', isAuthenticated, (req,res) => {
     res.render('notes/new-note')
 });
 
 //Proceso de guardar la nota o devolver errores en caso de no ser correctamente añadia por ausencia de la misma
-router.post('/notes/new-note', async (req,res) => {
+router.post('/notes/new-note', isAuthenticated, async (req,res) => {
 const {title,description}= req.body;
 const errors = [];
 if(!title){
@@ -25,7 +26,8 @@ if (errors.length > 0) {
         description
     });
 } else {
-    const newNote = new Note({ title, description})
+    const newNote = new Note({ title, description});
+    newNote.user = req.user.id;
     await newNote.save();
     req.flash('success_msg', 'Note Added Successfully!!')
     res.redirect('/notes')
@@ -33,8 +35,8 @@ if (errors.length > 0) {
 });
  
 // proceso para mostrar todas las notas del usuario
-router.get('/notes', async (req, res) => {
-    await Note.find().sort({date: 'desc'})
+router.get('/notes', isAuthenticated, async (req, res) => {
+    await Note.find({user: req.user.id}).sort({date: 'desc'})
       .then(documentos => {
         const contexto = {
             notes: documentos.map(documento => {
@@ -53,7 +55,7 @@ router.get('/notes', async (req, res) => {
 
 //Proceso de seleccionar para editar una nota y como te reedirige para poder modificarla
 
-  router.get('/notes/edit/:id', async (req, res) => {
+  router.get('/notes/edit/:id', isAuthenticated, async (req, res) => {
 
         const note = await Note.findById(req.params.id)
         .then(data =>{
@@ -67,7 +69,7 @@ router.get('/notes', async (req, res) => {
     });
 
     //Proceso de enviar la modificacion y devolvernos a el renderizado de todas las notas con la modificacion ya hecha
-    router.put('/notes/edit-note/:id', async (req, res) =>{
+    router.put('/notes/edit-note/:id', isAuthenticated, async (req, res) =>{
             const {title,description} = req.body;
              await Note.findByIdAndUpdate(req.params.id,{title, description});
             req.flash('success_msg', 'Note Updated Successfully')
@@ -75,7 +77,7 @@ router.get('/notes', async (req, res) => {
         });
 
     //Borrado de todas las notas    
-    router.delete('/notes/delete/:id', async (req, res) =>{
+    router.delete('/notes/delete/:id', isAuthenticated, async (req, res) =>{
         await Note.findByIdAndDelete(req.params.id)
         req.flash('success_msg', 'Note Delete Successfully')
         res.redirect(('/notes'))
